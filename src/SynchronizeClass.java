@@ -1,3 +1,5 @@
+import java.util.Collections;
+
 public class SynchronizeClass {
 
     public static void main(String[] args) throws InterruptedException {
@@ -6,6 +8,7 @@ public class SynchronizeClass {
         resource.setI(5);
 
         MyThreadd thread1 = new MyThreadd();
+        thread1.setName("one");
         thread1.setResource(resource);
         thread1.start();
 
@@ -40,15 +43,42 @@ class Resource {
 
     private int i;
 
-    public void changeI() {
-        int i = this.i;
+    static int j;
 
-        if (Thread.currentThread().getName().equals("one")) {
-            Thread.yield();
+    public static void changeSynchI() {
+        synchronized (Resource.class) {
+
+        }
+    }
+
+    public void changeI() {
+
+        synchronized (this) {
+            int i = this.i;
+
+            if (Thread.currentThread().getName().equals("one")) {
+                Thread.yield();
+            }
+
+            i++;
+            this.i = i;
         }
 
-        i++;
-        this.i = i;
+
+
+        /*
+         * Thread 1:
+         *  int i = this.i  --> i = 5;
+         *
+         * Thread 2:
+         * int i = this.i  --> i = 5;
+         * i++;
+         * this.i = i;  --> i = 6;
+         *
+         *  Thread 1:
+         *  i++;
+         *  this.i = i;  --> i = 6;
+         */
     }
 
     public int getI() {
